@@ -35,6 +35,8 @@ int main(void) {
     if ((e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event, 0x12345))) != 0) {
         printf("[ ERROR ]  failed to dispatch event, error: %d\n", e);
     }
+
+    dispatcher_free(dispatcher);
     return 0;    
 }
 ```
