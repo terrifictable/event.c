@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "lib/types.h"
+#include "common.h"
 
 typedef struct _event {
     /* event id */
@@ -13,16 +14,24 @@ typedef struct _event {
     /* event value */
     void  *val;
 } event_t;
-#define MAKE_EVENT(i, v) { .id = i, .val = (void*)v }
+#define MAKE_EVENT(i, v) (event_t){ .id = i, .val = (void*)v }
 
-typedef void(*receiver_t)(event_t *);
+// typedef void(*receiver_t)(event_t *);
+typedef struct _receiver {
+    /*
+     * incase receiver should have other values
+     */
+
+    void(*func)(struct _receiver *, event_t *);
+} receiver_t;
+#define MAKE_RECEIVER(f) (receiver_t){ .func = f } 
 
 typedef struct _dispatcher {
     /* receiverse is 2d array:
      * [id] -> list of receivers for event `id`
-     * [id][idx] -> receiver `idx` for event `id`
+     * [id][idx] -> ptr to receiver `idx` for event `id`
      */
-    receiver_t**  receivers;
+    receiver_t***  receivers;
 
     /* array of counts for receivers
      * [id] -> count of receivers for event `id`
@@ -52,7 +61,7 @@ dispatcher_t* dispatcher_new            (uint size);
  *   (uint)          id:         event id to add receiver for
  *   (receiver_t*)   receiver:   function to add to receivers for event $id
  */
-void          dispatcher_add_receiver   (dispatcher_t *dispatcher, uint id, receiver_t receiver);
+void          dispatcher_add_receiver   (dispatcher_t *dispatcher, uint id, receiver_t *receiver);
 
 /* 
  * params:
