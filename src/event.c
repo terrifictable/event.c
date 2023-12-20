@@ -20,7 +20,7 @@ void dispatcher_free(dispatcher_t *dispatcher) {
 
 
 
-void dispatcher_add_receiver(dispatcher_t *dispatcher, uint id, receiver_t receiver) {
+void dispatcher_add_receiver(dispatcher_t *dispatcher, uint id, receiver_t *receiver) {
     if (dispatcher->count < id) {
         dispatcher->receivers = realloc(dispatcher->receivers, (id+1) * sizeof(receiver_t*));
         dispatcher->receivers_count = realloc(dispatcher->receivers_count, (id+1) * sizeof(int));
@@ -38,7 +38,16 @@ int dispatcher_dispatch_event(dispatcher_t *dispatcher, event_t e) {
     }
 
     for (uint i = 0; i < dispatcher->receivers_count[e.id]; i++) {
-        dispatcher->receivers[e.id][i](&e);
+        receiver_t *receiver = dispatcher->receivers[e.id][i];
+        if (receiver == NULL) {
+            warn("receiver [%d] is NULL", i);
+            continue;
+        }
+        if (receiver->func == NULL) {
+            warn("receiver[%d]->func is NULL", i);
+            continue;
+        }
+        receiver->func(receiver, &e);
     }
     return 0;
 }
