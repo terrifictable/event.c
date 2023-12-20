@@ -29,7 +29,7 @@ void receiver(event_t *event) {
 int main(void) {
     dispatcher_t *dispatcher = dispatcher_new(0);
     
-    dispatcher_add_receiver(dispatcher, test_event, test_receiver);
+    dispatcher_add_receiver(dispatcher, test_event, &MAKE_RECEIVER(test_receiver));
 
     int e;
     if ((e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event, 0x12345))) != 0) {
