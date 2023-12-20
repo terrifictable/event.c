@@ -60,7 +60,7 @@ void          dispatcher_add_receiver   (dispatcher_t *dispatcher, uint id, rece
  * 
  * return: (int)
  *   0 -> no error
- *   1 -> invalid id
+ *   1 -> invalid/unknown event id
  */
 int           dispatcher_dispatch_event (dispatcher_t *dispatcher, event_t e);
 

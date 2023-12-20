@@ -27,15 +27,9 @@ void dispatcher_add_receiver(dispatcher_t *dispatcher, uint id, receiver_t recei
         dispatcher->count = id;
     }
 
-    uint count = dispatcher->receivers_count[id];
-    if (count == 0) {
-        dispatcher->receivers[id] = calloc(count+1, sizeof(receiver_t));
-    }
-    count++;
-    
+    uint count = ++dispatcher->receivers_count[id];
     dispatcher->receivers[id] = realloc(dispatcher->receivers[id], (count+1) * sizeof(receiver_t*));
     dispatcher->receivers[id][count - 1] = receiver;
-    dispatcher->receivers_count[id] = count;
 }
 
 int dispatcher_dispatch_event(dispatcher_t *dispatcher, event_t e) {
