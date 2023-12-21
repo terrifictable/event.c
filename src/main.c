@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "lib/types.h"
 #include "common.h"
@@ -28,18 +29,23 @@ void test_receiver_2(receiver_t *this, event_t *event) {
 int main(void) {
     dispatcher_t *dispatcher = dispatcher_new(0);
 
-    dispatcher_add_receiver(dispatcher, test_event_1, &MAKE_RECEIVER(test_receiver));
-    dispatcher_add_receiver(dispatcher, test_event_2, &MAKE_RECEIVER(test_receiver_2));
+    receiver_t receiver_1 = MAKE_RECEIVER(test_receiver);
+    receiver_t receiver_2 = MAKE_RECEIVER(test_receiver_2);
 
+    dispatcher_add_receiver(dispatcher, test_event_1, &receiver_1);
+    dispatcher_add_receiver(dispatcher, test_event_2, &receiver_2);
 
-    int e;
-    e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event_1, "hello"));
-    if (e != 0) {
-        printf("dispatching event (%d) failed: %d\n", test_event_1, e);
-    }
-    e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event_2, 0x42069));
-    if (e != 0) {
-        printf("dispatching event (%d) failed: %d\n", test_event_2, e);
+    srand(time(NULL));
+    for (int i=0; i < 10; i++) {
+        int e;
+
+        bool r = ((int)(rand() * 0.1) % 10) > 5;
+        if (r)  e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event_1, "Hello"));
+        else    e = dispatcher_dispatch_event(dispatcher, MAKE_EVENT(test_event_2, 0x69420));
+
+        if (e != 0) {
+            printf("dispatching event (%d) failed: %d\n", r, e);
+        }
     }
 
     goto cleanup;
